@@ -1,52 +1,45 @@
 #!/bin/perl -l
-use utf8;
 
-my ($w, $y);
-my %parsers = (
-	'^' => sub {{ tag=>'trap', x=>shift, y=>shift, type=>shift, subtype=>shift }},
-	'@' => sub {{ tag=>'enemy', x=>shift, y=>shift, type=>shift }},
-	'|' => sub { map { tag=>'tile', x=>$_, y=>$y, type=>$_[$_], zone=>6 }, 0..$#_ },
+my %gates = (
+	'O'  => 'k1',
+	# '&A' => 'l1h3o2o1h2k0',
+	'&>' => 'h3l1o2l1k2',
+	'&^' => 'h3o2l1o2k2',
+	'&|' => 'l1l2h2',
+	'<&' => 'l1h3o2h3k2',
+	'<A' => 'l1h3o2k2',
+	'B>' => 'h3l1o2k2',
+	'BA' => 'l1h3o2h2',
+	'^&' => 'l1o2h3o2k2',
+	'|&' => 'h3h2l2',
 );
 
-sub parse {
-	$y = -1;
-	map {
-		s/.//;
-		$y += $& eq '|';
-		$parsers{$&}->(unpack "w*", $_ ^ y// /cr);
-	} $_[0] =~ /[|@^][^|@^]+/g;
-}
+my $regex = join '|', map quotemeta, keys %gates;
 
-my %modules = (
-	"\n" => '|   |   |   ',
-	'I'  => '|   | 4V|GVV^"!!%@!!¥g',
-	'i'  => '|   | 4V|GVV^"!!%@!!¥g',
-	' '  => '| 4 | 4 | 4 ',
-	'O'  => '| 4 | 4 |   ^! !"',
-	'A<' => '| 44 44| 44   | 4    ^$ !!^# !%^"!!&^" !$^#!!$^%"" ',
-	'&|' => '| 4  4 | 4 44 | 4  4 ^!!! ^"!! ^#!! ^#"!!^""!!',
-	'|&' => '| 4  4 | 44 4 | 4  4 ^$!!!^#!!!^"!!!^""! ^#"! ',
-	'BA' => '| 4  4 | 4  4 | 4  4 ^! ! ^" !$^$ !!^# !%^""!!^#"! ',
-);
+my $w = 31;
 
-my $regex = join '|', map quotemeta, keys %modules;
-
-my @nodes = map { { tag=>'item', type=>$_ } } qw(
-	misc_map head_circlet_telepathy torch_foresight weapon_dagger_electric
+my @nodes = (
+	map({ tag=>'item', type=>$_ }, qw(misc_map head_circlet_telepathy weapon_dagger_electric)),
+	map({ tag=>'tile', zone=>'6', x=>$_ }, 0..$w),
+	map({ tag=>'tile', zone=>'6', x=>$_, y=>1, type=>(0, 18)[$_<$w && ($_&1)] }, 0..$w),
+	map({ tag=>'tile', zone=>'6', x=>$_, y=>2, type=>103 }, 0..$w),
+	map({ tag=>'enemy', type=>'1', y=>1, x=>2*$_ }, 0..$w/2),
 );
 
 while (<>) {
-	++$w   while y///c > $w;
-	s/$/ / while y///c < $w;
-	while (/$regex|(..?)(?{die "Unknown gate: $1"})/g) {
-		my @module = parse($modules{$&});
-		$_->{x} += $-[0] * 3 for @module;
-		$_->{y} += ($. - 1) * 3 for @module;
-		push @nodes, @module;
+	while (/$regex|[\sIi]|(..?)(?{die "Unknown gate: $1"})/g) {
+		my $x = $-[0] * 2 - 1;
+		push @nodes, map { /(.)(.)/; {
+			tag => 'trap',
+			x => $x + int($2),
+			y => 2,
+			type => 1,
+			subtype => index('lhjknbyuo', $1),
+		}} $gates{$&} =~ /../g;
 	}
 }
 
-print "<dungeon character='1009'><level>";
+print "<dungeon character='1009' numLevels='1'><level num='1'>";
 
 for (qw(tiles traps enemies items)) {
 	my $tag = s/(ie)?s$/$1 ? 'y' : ''/re;
