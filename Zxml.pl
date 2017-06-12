@@ -1,17 +1,23 @@
 #!/bin/perl -l
 
-my %gates = (
-	'O'  => 'k1',
-	# '&A' => 'l1h3o2o1h2k0',
-	'&>' => 'h3l1o2l1k2',
-	'&^' => 'h3o2l1o2k2',
-	'&|' => 'l1l2h2',
-	'<&' => 'l1h3o2h3k2',
-	'<A' => 'l1h3o2k2',
-	'B>' => 'h3l1o2k2',
-	'BA' => 'l1h3o2h2',
-	'^&' => 'l1o2h3o2k2',
-	'|&' => 'h3h2l2',
+my %gates = qw(
+	O  k1
+	&| l0l1h1
+	|& h2h1l1
+	<A l0h2o1k1
+	BA l0h2o1h1
+	B> h2l0o1k1
+	^& l0o1h2o1k1
+	<& l0h2o1h2k1
+	&> h2l0o1l0k1
+	&^ h2o1l0o1k1
+	B& h2l0o1o2k3l1
+	A< l0h2o1k1l0h2o1
+	>B h2l0o1k1l0h2o1
+	&B h2l0o1l0l2k3l1
+	&& h2h1l0o1l2k3l1
+	&A l0l2l1h3o2k1h2h1h3
+	A& l0h2l2o1l0k1h2h1h3
 );
 
 my $regex = join '|', map quotemeta, keys %gates;
@@ -28,7 +34,7 @@ my @nodes = (
 
 while (<>) {
 	while (/$regex|[\sIi]|(..?)(?{die "Unknown gate: $1"})/g) {
-		my $x = $-[0] * 2 - 1;
+		my $x = $-[0] * 2;
 		push @nodes, map { /(.)(.)/; {
 			tag => 'trap',
 			x => $x + int($2),

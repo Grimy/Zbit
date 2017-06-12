@@ -1,8 +1,9 @@
 #!/usr/bin/perl -ln
 
-push @_, sprintf("%0*b", length $&, shift) =~ /./g while /Ii*/g;
-print(oct 'b' . join '', @_), last if /O/;
+(@_[$-[0]..$+[0]-1]) = split(//, sprintf "%0*b", length $&, shift) while /Ii*/g;
+@_ = map int, @_;
+print(oct 'b' . join '', @_[$-[0]..$+[0]-1]), last if /O+/g;
 print STDERR s/.\K/ /gr;
-y/AB/#;/;
-@_[@-] = map { int eval join chr ord, @_[@-] } $&, $1 while /[&|^<>#;](.)/gi;
+y/0AB/%#;/;
+@_[@-] = map { eval join chr ord, @_[@-] } $&, $1 while /[&|^<>#;](.)/gi;
 print STDERR "@_";
