@@ -4,8 +4,8 @@ my %gates = ();
 my @names = qw(0 & > A < B ^ |);
 my $n = 10;
 
-gate: for (10**7..10**8) {
-	s/./qw(k1 k3 l0 l1 l2 h1 h2 h3 o1 o2)[$&]/ge;
+gate: for (0..10**8) {
+	s/./qw(o1 o2 k1 k3 l0 l1 l2 h1 h2 h3)[$&]/ge;
 	$gate = $_;
 	my @results = (0, 0);
 

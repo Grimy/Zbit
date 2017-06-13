@@ -1,7 +1,10 @@
 #!/bin/perl -l
 
 my %gates = qw(
-	O  k1
+	O  k0
+	0& l0h2k1
+	0A l0l2o1k3
+	0^ h2h1l0l1u0
 	&| l0l1h1
 	|& h2h1l1
 	<A l0h2o1k1
@@ -22,19 +25,26 @@ my %gates = qw(
 
 my $regex = join '|', map quotemeta, keys %gates;
 
-my $w = 31;
+my $w = 47;
 
 my @nodes = (
 	map({ tag=>'item', type=>$_ }, qw(misc_map head_circlet_telepathy weapon_dagger_electric)),
-	map({ tag=>'tile', zone=>'6', x=>$_ }, 0..$w),
-	map({ tag=>'tile', zone=>'6', x=>$_, y=>1, type=>(0, 18)[$_<$w && ($_&1)] }, 0..$w),
-	map({ tag=>'tile', zone=>'6', x=>$_, y=>2, type=>103 }, 0..$w),
-	map({ tag=>'enemy', type=>'1', y=>1, x=>2*$_ }, 0..$w/2),
+	map({ tag=>'tile', zone=>6, x=>$_, type=>20 }, 0..$w),
+	map({ tag=>'tile', zone=>6, x=>$_, y=>1, type=>18 * ($_&1) }, 0..$w),
+	map({ tag=>'tile', zone=>6, x=>$_, y=>2, type=>103 }, 0..$w),
+	map({ tag=>'trap', type=>1, subtype=>7, x=>2*$_, y=>2 }, 0..$w/2),
 );
+my @input;
 
 while (<>) {
 	while (/$regex|[\sIi]|(..?)(?{die "Unknown gate: $1"})/g) {
 		my $x = $-[0] * 2;
+		if (lc($&) eq 'i') {
+			push @nodes, { tag=>'enemy', type=>1, x=>$x, y=>1 } if !$input[$x]++;
+			push @nodes, { tag=>'enemy', type=>1, x=>$x, y=>1 };
+			push @nodes, { tag=>'trap', type=>1, subtype=>2, x=>$x, y=>1 };
+			next;
+		}
 		push @nodes, map { /(.)(.)/; {
 			tag => 'trap',
 			x => $x + int($2),
