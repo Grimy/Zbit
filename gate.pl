@@ -26,8 +26,17 @@ my %traps = (
 );
 
 # Maps logical gates to the shortest sequence of traps implementing them.
+# nnn: useless
+# ynn: B=0
+# nyn: A=0
+# nny: A=B
+# yyn: !(A&B)
+# yny: A=1
+# nyy: B=1
+# yyy: default
+
 my %gates = ("123" => "");
-my @q = ("123");
+my @q = (keys %gates);
 
 while (my $gate = shift @q) {
 	for my $trap (keys %traps) {
@@ -36,7 +45,8 @@ while (my $gate = shift @q) {
 		next if defined $gates{$_};
 		push @q, $_;
 		$gates{$_} = $gates{$gate} . $trap;
-		my $name = pack('b*b*', $_, y/12/21/r) =~ y//0><^&AB/cr;
+		print; next;
+		my $name = pack('b*b*', $_, y/12/21/r) =~ y//0><^&AB|/cr;
 		print "$name $gates{$_}" if !/[4-7]/;
 	}
 }
