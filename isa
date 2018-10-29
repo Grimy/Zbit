@@ -1,0 +1,45 @@
+* test initting with water on save point
+* investigate why conditional move works despite trap downtime
+
+cmov impl:
+  h
+l
+ o
+
+B
+ B
+  !
+
+fibo:
+cmov r1 r0 r2
+swap r2 r3
+add r2 r1
+kill r1
+
+syracuse:
+and r0 r1 :0
+cright r1
+and r0 r1+
+add r1 r0
+left r2-
+
+
+
+unary:
+up rX       # rX <<= 1
+down rX     # rX >>= 1
+andi rX IMM # rX &= IMM
+
+binary:
+and rD rS   # rD &= rS
+andc rD rS  # rD &= ~rS
+
+andor rA rB # rA & rB, rA | rB
+swap rA rB  # rA, rB = rB, rA
+add rD rS   # rD += rS
+
+mov rD rS      # rD = rS (requires rD = 0)
+cmov rD rS rC  # rD = rS & rC, rS = rS & !rC
+
+1 0 N n
+    
