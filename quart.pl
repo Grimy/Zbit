@@ -239,31 +239,56 @@ send i
 
 ;;;; Sequence averager
 
-qset 3 1
+@64
+; recv loop
+recv A
+inc Q
+save A Q
+not A
+mul I A
 
-recv a
-inc q
-save a q
-not a
-add i a
-div i i
+; just once
+dec Q
+copy A Q
 
-dec q
-load a q
-qset 3 0
-copy b a
-div b q
-qset 3 2
-save q b
-qset 3 0
-mul q b
-sub a q
-inc b 3
+; start avg loop, A=length
+; n n [n] rest
+; code
+; 0 0 sum
+; 0 0 0
 
-qset 3 1
-dec q
-qget 3
+load B Q
+qset 3 3
+save A Q
+div B A
+qset 2 3
+load A Q
+add A B
+save A Q
+dec Q
+save A Q
+inc Q
+qset 3 3
+load A Q
+mul B A
+qset 0 3
+load A Q
+sub A B
+inc Q
+load B Q
+add B A
+sub A A
+save A Q
+dec Q
+save B Q
+qset 3 3
+load A Q
+sub B A
+not B
+sub Q B
+; jump to avg loop
 
+; epilogue todo
 
 =cut
 

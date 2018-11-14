@@ -28,7 +28,6 @@ left r2-
 unary:
 up rX       # rX <<= 1
 down rX     # rX >>= 1
-andi rX IMM # rX &= IMM
 
 binary:
 and rD rS   # rD &= rS
